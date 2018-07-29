@@ -1,9 +1,13 @@
-import React, {Component} from 'react';
+import React, {Component, Fragment} from 'react';
+import Select from 'react-select';
 
 class App extends Component {
 
     state = {
-        employeeInfo: {}
+        employeeInfo: {},
+
+        // NEW
+        optionsData: []
     };
 
     handleClick = (e) => {
@@ -12,17 +16,46 @@ class App extends Component {
         const newEmployeeInfo = employees.find((data) => data.userId === e.currentTarget.dataset.userId);
 
         this.setState({
-            employeeInfo: newEmployeeInfo
+            employeeInfo: newEmployeeInfo,
         })
     };
+
+    componentDidMount() {
+
+        // NEW
+        fetch('data.json')
+            .then(result => result.json())
+            .then(data => {
+
+                setTimeout(() => {
+                    this.setState({
+                        optionsData: data
+                    });
+                }, 5000);
+
+            });
+
+    }
 
     render() {
 
         const {employees} = this.props;
-        const {employeeInfo} = this.state;
+        const {employeeInfo, optionsData} = this.state;
 
         return (
-            <div>
+            <Fragment>
+
+                {/*NEW*/}
+                <br/>
+
+                <Select
+                    options={optionsData}
+                    isLoading={!optionsData.length}
+                    defaultValue={optionsData.length ? optionsData[0] : ''}
+                />
+
+                <br/>
+
                 <ol style={{float: 'left', width: '30%'}}>
                     {employees.map((employee) => (
                         <li
@@ -47,7 +80,8 @@ class App extends Component {
                         <li>Employee Code: <b>{employeeInfo.employeeCode}</b></li>
                     </ul>
                     : ''}
-            </div>
+
+            </Fragment>
         );
     }
 }
